@@ -1,5 +1,5 @@
 [Package]
-version: 1
+version: 2
 depends: 
 incremental: False
 
@@ -58,6 +58,10 @@ values: ["none", "post-deinstall.opsiinc"]
 default: ["none"]
 
 [Changelog]
+dfn_cdrtfe (1.5.5-2)
+	* uninstall.vbs nach $InstallDir$ kopieren und nicht in 'files' ablegen (einfacheres Updaten)
+ -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 29.02.2016
+
 dfn_cdrtfe (1.5.5-1)
 	* Neue Upstreamversion
  -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 29.02.2016
@@ -65,6 +69,8 @@ dfn_cdrtfe (1.5.5-1)
 dfn_cdrtfe (1.5.4.1-1)
 	* initiales DFN-Paket
  -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 23.02.2016
+
+
 
 
 

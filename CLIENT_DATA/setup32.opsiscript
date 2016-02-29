@@ -32,6 +32,9 @@ else
 		isFatalError
 	endif
 	
+	comment "Copy uninstall.vbs hint"
+	Files_install_vbs
+	
 	comment "Set default GUI Language"
 	Patches_cdrtfe_lang.ini $InstallDir$+"\translations\cdrtfe_lang.ini"
 
@@ -58,6 +61,9 @@ endif
 
 [Files_install]
 copy -s "%ScriptPath%\files\*.*" "$InstallDir$"
+
+[Files_install_vbs]
+copy "%ScriptPath%\uninstall.vbs" "$InstallDir$"
 
 [Patches_cdrtfe_lang.ini]
 change [Languages] Default=$default_lang$
