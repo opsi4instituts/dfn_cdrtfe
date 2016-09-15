@@ -1,5 +1,5 @@
 [Package]
-version: 2
+version: 1
 depends: 
 incremental: False
 
@@ -9,7 +9,7 @@ id: dfn_cdrtfe
 name: cdrtfe
 description: Open-Source Programm zum Brennen von Daten-Disks, Audio-CDs, XCD, (S)VideoCDs und Video-DVDs sowie zum Erstellen von ISO-Images und Boot-Disks
 advice: 
-version: 1.5.5
+version: 1.5.6
 priority: 0
 licenseRequired: False
 productClasses: 
@@ -58,6 +58,11 @@ values: ["none", "post-deinstall.opsiinc"]
 default: ["none"]
 
 [Changelog]
+dfn_cdrtfe (1.5.6-1)
+	* Neue Upstreamversion
+	* o4i-Logo
+ -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 15.09.2016
+
 dfn_cdrtfe (1.5.5-2)
 	* uninstall.vbs nach $InstallDir$ kopieren und nicht in 'files' ablegen (einfacheres Updaten)
  -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 29.02.2016
@@ -69,6 +74,7 @@ dfn_cdrtfe (1.5.5-1)
 dfn_cdrtfe (1.5.4.1-1)
 	* initiales DFN-Paket
  -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 23.02.2016
+
 
 
 
