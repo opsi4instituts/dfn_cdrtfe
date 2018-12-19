@@ -1,21 +1,54 @@
-Set $SearchPattern$ = $ProductId$
-; Parameter: $SearchPattern$ Suchbegriff in Registry
-Sub_search_registry32_uninstall_keys
-; Rückgabewert: $ResultList$ gefundene Einträge
+; Ergebnis ist StringList (mehrere Einträge möglich);
+; in einer Zeile werden drei Ergebnisse mit "|" abgetrennt geliefert: Registrykey (mit Pfad) | Bereich Registry (kann direkt getRegistryValue übergeben werden | DisplayName
+; z.B. HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Test64|64bit|Test Registry Entry64
+Set $ResultList$ = SearchRegistryUninstallKeys($ProductId$)
 
 Switch count ($ResultList$)
 	Case "0"
-		comment "No installations of " + $SearchPattern$ + " found in $RegPathUninstall$. Nothing to do"
+		comment "No installations of " + $ProductName$ + " found in registry. Nothing to do"
 	EndCase
 	Case "1"
 		Message "Uninstalling " + $ProductName$ + " 32 Bit..."
-		Set $RegId$ = takeString(0, $ResultList$)
-		comment "Found a version which was installed by just copying the files (like we do)
-		Set $UnInstallDir$ = GetRegistryStringValue32("[" + $RegPathUninstall$ + "\" + $RegId$ + "] InstallLocation")
-		Files_uninstall
-		Registry_uninstall /32Bit
-		LinkFolder_uninstall_programs
-
+		Set $RegId$ = takeString (0,splitString(takeString(0, $ResultList$),"|"))
+		Set $RegBitScope$ = takeString (1,splitString(takeString(0,$ResultList$), '|'))
+		Set $DisplayName$ = takeString (2,splitString(takeString(0,$ResultList$), '|'))
+		
+		Set $UninstallProgram$ = GetRegistryValue($RegId$, "UninstallString", $RegBitScope$)
+		
+		if (contains(lower($UninstallProgram$), "uninstall.vbs") AND contains($DisplayName$, "OPSI") )
+			comment "Found a version which was installed by OPSI and just copying the files (like we do)"
+			Set $UnInstallDir$ = GetRegistryValue($RegId$, "InstallLocation", $RegBitScope$)
+			Files_uninstall
+			Registry_uninstall /32Bit
+			LinkFolder_uninstall_programs
+		endif
+		
+		if (contains(lower($UninstallProgram$), "msiexec.exe"))
+			comment "Found a version which was installed by MSI"
+			; exitcode library von UIB (siehe C:\program files(x86)\opsi.org\opsi-client-agent\opsi-winst\lib) mit 'local functions'
+			importLib "uib_exitcode.opsiscript::isMsiExitcodeFatal"
+			; für MSI wird nur der eigentliche Regkey (ohne Pfad) benötigt
+			Set $RegId$ = takeString (-1,splitString($RegId$,"\"))
+			Winbatch_uninstall_msi
+			Set $ExitCode$ = getLastExitCode
+			if stringToBool(isMsiExitcodeFatal($ExitCode$, "True", $ErrorString$))
+				isFatalError
+			endif
+		endif
+		
+		if (contains(lower($UninstallProgram$), "unins000.exe"))
+			comment "Found a version which was installed by Inno installer"
+			; exitcode library von UIB (siehe C:\program files(x86)\opsi.org\opsi-client-agent\opsi-winst\lib) mit 'local functions'
+			importLib "uib_exitcode.opsiscript::isInnoExitcodeFatal"
+			; entferne störende Anführungszeichen von $UninstallProgram$
+			Set $UninstallProgram$ = unquote($UninstallProgram$,'"')
+			Winbatch_uninstall_inno
+			Set $ExitCode$ = getLastExitCode
+			if stringToBool(isInnoExitcodeFatal($ExitCode$, "True", $ErrorString$))
+				isFatalError
+			endif			
+		endif
+		
 		if $DesktopLink$ = "true"
 			comment "Delete common desktop link"
 			Linkfolder_delete_desktoplink	
@@ -33,7 +66,7 @@ Switch count ($ResultList$)
 		logError "Found more than one installation! This case is not intended yet in this script! Stop now."
 		isFatalError
 	EndCase
-EndSwitch                    
+EndSwitch  
 
 [Files_uninstall]
 delete -sf $UnInstallDir$
@@ -48,4 +81,10 @@ set_basefolder common_startmenu
 delete_subfolder "Programs\$ProductName$"
 	
 [Registry_uninstall]
-deletekey [$RegPathUninstall$\$ProductId$]
+deletekey [$RegId$]
+
+[Winbatch_uninstall_msi]
+msiexec /qn /x $RegId$ REBOOT=ReallySuppress
+
+[Winbatch_uninstall_inno]
+"$UninstallProgram$" /VERYSILENT /norestart /nocancel /SUPPRESSMSGBOXES

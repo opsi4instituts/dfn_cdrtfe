@@ -1,13 +1,12 @@
 [Package]
-version: 1
+version: 2
 depends: 
-incremental: False
 
 [Product]
 type: localboot
 id: dfn_cdrtfe
 name: cdrtfe
-description: Open-Source Programm zum Brennen von Daten-Disks, Audio-CDs, XCD, (S)VideoCDs und Video-DVDs sowie zum Erstellen von ISO-Images und Boot-Disks
+description: Brennprogramm für verschiedene CD-/DVD-Formate zum Erstellen von ISO-Images und Boot-Disks [Burning application for various formats of CD-/DVD discs and creating of ISO images and bootable discs]
 advice: 
 version: 1.5.8
 priority: 0
@@ -55,6 +54,13 @@ values: ["none", "post-deinstall.opsiinc"]
 default: ["none"]
 
 [Changelog]
+dfn_cdrtfe (1.5.8-2)
+	* neue Registrysuche (https://github.com/opsi4instituts/lib, winst-Version 4.12.0.16 Voraussetzung)
+	* neues o4i-Logo ("opsi4instutes")
+	* zusätzlicher Check der Paket- bzw. Produktversion (via FileInfoList)
+	* Deinstallation: suche ggf. nach vorhandenen Installationen via MSI bzw. Exe (Inno) & Check ExitCode mit uib_exitcode (local function)
+ -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 19.12.2018
+
 dfn_cdrtfe (1.5.8-1)
 	* Neue Upstreamversion
 	* Anpassungen gem. o4i-Richtlinie (Desktop-Link, Logo)
